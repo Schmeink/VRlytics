@@ -16,14 +16,16 @@ AJsonActor::AJsonActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
+	
 }
 
 // Called when the game starts or when spawned
 void AJsonActor::BeginPlay()
 {
+
 	Super::BeginPlay();
 	
-
 	const FString JsonFilePath = FPaths::ProjectContentDir() + "/data/iris.json";
 	FString JsonString; //Json converted to FString
 
@@ -41,7 +43,7 @@ void AJsonActor::BeginPlay()
 	if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
 	{
 		//The person "object" that is retrieved from the given json file
-		auto IrisArray = JsonObject->GetArrayField("data");
+		IrisArray = JsonObject->GetArrayField("data");
 		for (auto row : IrisArray)
 		{
 			TSharedPtr<FJsonObject> IrisObject = row->AsObject();

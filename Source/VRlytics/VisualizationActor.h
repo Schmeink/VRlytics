@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "JsonActor.generated.h"
+#include "VisualizationActor.generated.h"
 
 UCLASS()
-class VRLYTICS_API AJsonActor : public AActor
+class VRLYTICS_API AVisualizationActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AJsonActor();
+	AVisualizationActor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,5 +22,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	class TArray<TSharedPtr<class FJsonValue>> IrisArray;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+		class UChildActorComponent* jsonChildActor;
+	UPROPERTY()
+		class UStaticMeshComponent* sphere;
+	UPROPERTY(EditAnywhere)
+		class UStaticMesh* mesh;
+	UPROPERTY(EditAnywhere)
+		class AJsonActor* jActor;
 };

@@ -3,7 +3,7 @@
 
 #include "VisualizationActor.h"
 #include "JsonActor.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "DOM/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -23,32 +23,59 @@ void AVisualizationActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*jsonChildActor = NewObject<UChildActorComponent>(this);
-	jsonChildActor->bEditableWhenInherited = true;
-	jsonChildActor->RegisterComponent();
-	jsonChildActor->SetChildActorClass(AJsonActor::StaticClass());
-	jsonChildActor->CreateChildActor();*/
+	if (readJsonToArray())
+	{
+		//The person "object" that is retrieved from the given json file
+		for (auto row : IrisArray) {
+			TSharedPtr<FJsonObject> IrisObject = row->AsObject();
+			FTransform transformation(FVector(IrisObject->GetNumberField("sepalLength"), IrisObject->GetNumberField("sepalWidth"), IrisObject->GetNumberField("petalLength")));
+			transformation.ScaleTranslation(150);
+			transformation.SetScale3D(FVector(0.1, 0.1, 0.1));
 
-	//jActor = CreateDefaultSubobject<AJsonActor>(TEXT("JsonActor"));
-	
+			UStaticMeshComponent* newSphere = NewObject<UStaticMeshComponent>(this);
+			newSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			newSphere->SetStaticMesh(mesh);
+			newSphere->SetCollisionProfileName(TEXT("NoCollision"));
+			newSphere->SetWorldTransform(transformation);
+			newSphere->RegisterComponent();
+			if (IrisObject->GetStringField("species") == "setosa") {
+				newSphere->SetMaterial(0, materialBlue);
+			}
+			if (IrisObject->GetStringField("species") == "versicolor") {
+				newSphere->SetMaterial(0, materialRed);
+			}
+			if (IrisObject->GetStringField("species") == "virginica") {
+				newSphere->SetMaterial(0, materialGreen);
+			}
 
-	sphere = NewObject<UStaticMeshComponent>(this);
-	sphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	sphere->SetStaticMesh(mesh);
-	sphere->RegisterComponent();
-	
-	if (jActor) {
-		TSharedPtr<FJsonObject> IrisObject = jActor->IrisArray[0]->AsObject();
-		sphere->SetRelativeLocation(FVector(IrisObject->GetNumberField("sepalLength"), IrisObject->GetNumberField("sepalWidth"), IrisObject->GetNumberField("petalLength")));
+			spheres.Add(newSphere);
+		}
 	}
-	else sphere->SetRelativeLocation(FVector(100,100,100));
-	
 }
+
+
 
 // Called every frame
 void AVisualizationActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool AVisualizationActor::readJsonToArray()
+{
+	const FString JsonFilePath = FPaths::ProjectContentDir() + "/data/iris.json";
+	FString JsonString; //Json converted to FString
+
+	FFileHelper::LoadFileToString(JsonString, *JsonFilePath);
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(JsonString);
+	FJsonSerializer::Deserialize(JsonReader, JsonObject);
+
+	if(!JsonObject.IsValid())
+		return false;
+	IrisArray = JsonObject->GetArrayField("data");
+	return true;
 }
 

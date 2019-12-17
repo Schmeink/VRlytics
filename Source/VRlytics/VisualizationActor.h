@@ -24,12 +24,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
-		class UChildActorComponent* jsonChildActor;
-	UPROPERTY()
-		class UStaticMeshComponent* sphere;
 	UPROPERTY(EditAnywhere)
 		class UStaticMesh* mesh;
 	UPROPERTY(EditAnywhere)
-		class AJsonActor* jActor;
+		class UMaterialInterface* materialRed;
+	UPROPERTY(EditAnywhere)
+		class UMaterialInterface* materialBlue;
+	UPROPERTY(EditAnywhere)
+		class UMaterialInterface* materialGreen;
+	class TArray<class UStaticMeshComponent*> spheres;
+	class TArray<TSharedPtr<class FJsonValue>> IrisArray;
+
+	bool readJsonToArray();
 };

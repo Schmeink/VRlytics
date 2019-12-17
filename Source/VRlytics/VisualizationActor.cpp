@@ -2,8 +2,7 @@
 
 
 #include "VisualizationActor.h"
-#include "JsonActor.h"
-#include "Components/InstancedStaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "DOM/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -29,8 +28,8 @@ void AVisualizationActor::BeginPlay()
 		for (auto row : IrisArray) {
 			TSharedPtr<FJsonObject> IrisObject = row->AsObject();
 			FTransform transformation(FVector(IrisObject->GetNumberField("sepalLength"), IrisObject->GetNumberField("sepalWidth"), IrisObject->GetNumberField("petalLength")));
-			transformation.ScaleTranslation(150);
-			transformation.SetScale3D(FVector(0.1, 0.1, 0.1));
+			transformation.ScaleTranslation(50);
+			transformation.SetScale3D(FVector(0.02, 0.02, 0.02));
 
 			UStaticMeshComponent* newSphere = NewObject<UStaticMeshComponent>(this);
 			newSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);

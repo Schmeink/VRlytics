@@ -21,44 +21,17 @@ AVisualizationActor::AVisualizationActor()
 void AVisualizationActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (readJsonToArray())
+	isDataValid = readJsonToArray();
+	if (isDataValid)
 	{
-		//The person "object" that is retrieved from the given json file
-		for (auto row : IrisArray) {
-			TSharedPtr<FJsonObject> IrisObject = row->AsObject();
-			FTransform transformation(FVector(IrisObject->GetNumberField("sepalLength"), IrisObject->GetNumberField("sepalWidth"), IrisObject->GetNumberField("petalLength")));
-			transformation.ScaleTranslation(50);
-			transformation.SetScale3D(FVector(0.02, 0.02, 0.02));
-
-			UStaticMeshComponent* newSphere = NewObject<UStaticMeshComponent>(this);
-			newSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-			newSphere->SetStaticMesh(mesh);
-			newSphere->SetCollisionProfileName(TEXT("NoCollision"));
-			newSphere->SetWorldTransform(transformation);
-			newSphere->RegisterComponent();
-			if (IrisObject->GetStringField("species") == "setosa") {
-				newSphere->SetMaterial(0, materialBlue);
-			}
-			if (IrisObject->GetStringField("species") == "versicolor") {
-				newSphere->SetMaterial(0, materialRed);
-			}
-			if (IrisObject->GetStringField("species") == "virginica") {
-				newSphere->SetMaterial(0, materialGreen);
-			}
-
-			spheres.Add(newSphere);
-		}
+		drawData();
 	}
 }
-
-
 
 // Called every frame
 void AVisualizationActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 bool AVisualizationActor::readJsonToArray()
@@ -78,3 +51,37 @@ bool AVisualizationActor::readJsonToArray()
 	return true;
 }
 
+void AVisualizationActor::switchMarkCode() {
+
+	for (UStaticMeshComponent* sm : dataPoints)
+		sm->SetStaticMesh(meshActive);
+}
+
+void AVisualizationActor::drawData() {
+	if (isDataValid) {
+		for (auto row : IrisArray) {
+			TSharedPtr<FJsonObject> IrisObject = row->AsObject();
+			FTransform transformation(FVector(IrisObject->GetNumberField("sepalLength"), IrisObject->GetNumberField("sepalWidth"), IrisObject->GetNumberField("petalLength")));
+			transformation.ScaleTranslation(50);
+			transformation.SetScale3D(FVector(0.02, 0.02, 0.02));
+
+			UStaticMeshComponent* newDataPoint = NewObject<UStaticMeshComponent>(this);
+			newDataPoint->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			newDataPoint->SetStaticMesh(meshActive);
+			newDataPoint->SetCollisionProfileName(TEXT("NoCollision"));
+			newDataPoint->SetWorldTransform(transformation);
+			newDataPoint->RegisterComponent();
+			if (IrisObject->GetStringField("species") == "setosa") {
+				newDataPoint->SetMaterial(0, materialBlue);
+			}
+			if (IrisObject->GetStringField("species") == "versicolor") {
+				newDataPoint->SetMaterial(0, materialRed);
+			}
+			if (IrisObject->GetStringField("species") == "virginica") {
+				newDataPoint->SetMaterial(0, materialGreen);
+			}
+
+			dataPoints.Add(newDataPoint);
+		}
+	}
+}

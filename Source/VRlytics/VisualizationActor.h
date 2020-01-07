@@ -18,22 +18,28 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UStaticMesh* meshActive;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "dataPoints")
+		TArray<class UStaticMeshComponent*> dataPoints;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(EditAnywhere)
-		class UStaticMesh* mesh;
+	bool isDataValid = false;
 	UPROPERTY(EditAnywhere)
 		class UMaterialInterface* materialRed;
 	UPROPERTY(EditAnywhere)
 		class UMaterialInterface* materialBlue;
 	UPROPERTY(EditAnywhere)
 		class UMaterialInterface* materialGreen;
-	class TArray<class UStaticMeshComponent*> spheres;
 	class TArray<TSharedPtr<class FJsonValue>> IrisArray;
 
 	bool readJsonToArray();
+	UFUNCTION(CallInEditor)
+		void switchMarkCode();
+	UFUNCTION(CallInEditor)
+		void drawData();
 };
